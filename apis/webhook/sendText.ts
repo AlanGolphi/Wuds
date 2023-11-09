@@ -19,6 +19,7 @@ export const sendText = async (text?: string | null, all: boolean = false) => {
       headers: {
         'Content-Type': 'application/json'
       },
+      cache: 'no-cache',
       body: JSON.stringify(data)
     })
     result = {
