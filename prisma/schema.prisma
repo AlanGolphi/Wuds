@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  email        String        @unique
-  name         String?
-  role         Role          @default(USER)
-  uploadImages UploadImage[]
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  role        Role         @default(USER)
+  uploadFiles UploadFile[]
 }
 
-model UploadImage {
-  id         String   @id @default(cuid())
+model UploadFile {
+  id         String   @id
   url        String
+  fileType   FileType @default(OTHER)
   createDate DateTime @default(now())
   userId     String
   user       User     @relation(fields: [userId], references: [id])
@@ -27,4 +28,10 @@ enum Role {
   GOD
   ADMIN
   USER
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+  OTHER
 }

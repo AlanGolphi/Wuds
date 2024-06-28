@@ -1,5 +1,11 @@
-import FileVault from "@/components/upload/file-vault"
+"use client"
+
+import { FileUploader } from "@/components/upload/file-uploader"
 
 export default function FileUpload() {
-  return <FileVault />
+  return (
+    <>
+      <FileUploader />
+    </>
+  )
 }

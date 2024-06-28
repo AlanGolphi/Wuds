@@ -1,7 +1,7 @@
 "use client"
 
 import { getAliOssSts } from "@/actions/get-ali-oss-sts"
-import { saveImageUrlAction } from "@/actions/save-image-url-action"
+import { saveFileUrlAction } from "@/actions/save-file-url-action"
 import OSS from "ali-oss"
 import { useAction } from "next-safe-action/hooks"
 import { useCallback, useEffect, useState } from "react"
@@ -11,7 +11,7 @@ import { Input } from "../ui/input"
 import { Progress } from "../ui/progress"
 
 export default function FileVault() {
-  const { execute, result, status } = useAction(saveImageUrlAction)
+  const { execute, result, status } = useAction(saveFileUrlAction)
   const [url, setUrl] = useState<string>("")
   const [userId, setUserId] = useState<string>("cluhtgyjw0000xt3gu5oc8gtj")
   const [file, setFile] = useState<File | null>(null)
@@ -29,11 +29,13 @@ export default function FileVault() {
           {
             parallel: 4,
             partSize: 1024 * 1024,
-            progress: function (p) {
+            progress: function (p, cpt, res) {
+              console.log("p: ", p, "cpt: ", cpt, "res: ", res)
               setProgress(p * 100)
             },
           }
         )
+        console.log("finish: ", result)
       } catch (e) {
         toast("upload error")
       }
@@ -44,9 +46,16 @@ export default function FileVault() {
   const handleDirectUpload = useCallback(
     (file: File | null) => {
       if (!store || !file) return
-      store.put("test-upload/test.jpg", file).then((result) => {
-        console.log(result)
-      })
+      store
+        .put("test-upload/test.jpg", file, {
+          headers: {
+            "x-oss-force-download": "false",
+            "Content-Disposition": "inline;",
+          },
+        })
+        .then((result) => {
+          console.log(result)
+        })
     },
     [store]
   )
@@ -62,6 +71,14 @@ export default function FileVault() {
         accessKeySecret: res.AccessKeySecret,
         bucket: res.bucket,
         stsToken: res.stsToken,
+        refreshSTSToken: async () => {
+          const res = await getAliOssSts()
+          return {
+            accessKeyId: res.AccessKeyId,
+            accessKeySecret: res.AccessKeySecret,
+            stsToken: res.stsToken,
+          }
+        },
       })
       setStore(store)
     }
