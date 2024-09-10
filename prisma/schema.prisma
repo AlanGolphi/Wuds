@@ -19,7 +19,7 @@ model UploadFile {
   id         String   @id
   url        String
   fileType   FileType @default(OTHER)
-  createDate DateTime @default(now())
+  createDate DateTime @default(now()) @db.Timestamptz()
   userId     String
   user       User     @relation(fields: [userId], references: [id])
 }
